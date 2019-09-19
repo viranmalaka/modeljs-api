@@ -36,7 +36,7 @@ TODO
   
  - Block actions
   - [ ] Block specific action for specific model. 
-  
+  ``If both allowed set and not allowed set is there, allowed set is prioritiesed``
   
  - Additional Configs
   - [ ] Take Order name from config

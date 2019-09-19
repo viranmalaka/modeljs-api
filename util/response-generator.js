@@ -6,8 +6,9 @@ module.exports = {
         result: res.mjsResult,
       });
     } else if (!res.mjsError) {
-      res.jsonp({success: true})
+      res.jsonp({ success: true });
     }
+    next();
   },
   error: (req, res) => {
     if (res.mjsError) {
@@ -16,5 +17,5 @@ module.exports = {
         error: res.mjsError || {},
       });
     }
-  }
+  },
 };

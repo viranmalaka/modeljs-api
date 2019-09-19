@@ -4,17 +4,18 @@ const indexRoute = require('./routes/index');
 const baseRoute = require('./routes/base-model-router');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const CONST = require('./util/const');
 
 const init = (app, config, hooks) => {
   config = configParse(config);
 
-  if(config.enableCors) {
+  if (config.enableCors) {
     app.use(cors()); // cross origin issues
   }
 
   // MongoDB configurations
   mongoose.Promise = global.Promise;
-  mongoose.connect('mongodb://localhost:27017/api-tester', { useNewUrlParser: true, useUnifiedTopology: true});
+  mongoose.connect('mongodb://localhost:27017/api-tester', { useNewUrlParser: true, useUnifiedTopology: true });
 
   const pathStart = `/${config.routePrefix}/${config.apiVersion}`;
   app.use(pathStart, indexRoute);
@@ -25,7 +26,7 @@ const init = (app, config, hooks) => {
   }
 
   // model vise routes
-  config.models.forEach(model => {
+  config.models.forEach((model) => {
     app.use(`${pathStart}/${model.path}`, baseRoute(model, hooks.models[model.name]));
   });
 
