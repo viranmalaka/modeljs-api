@@ -2,6 +2,7 @@ const baseController = require('../controller/base-controller');
 const to = require('../util/to');
 const hookHandler = require('../util/hooks-handler');
 const allowedAction = require('../util/allowed-action');
+const express = require('express');
 const {
   CREATE,
   DELETE,
@@ -14,16 +15,18 @@ const {
 } = require('../util/const').ACTIONS;
 
 module.exports = (config, hooks) => {
-  const express = require('express');
   const router = express.Router();
   const controller = new baseController(config);
   const modelHooks = hookHandler.modelPreHook(hooks);
 
+  // this middleware will handle if an action is blocked by the config
   const notAllowedMiddleware = (req, res, next) => {
+    req.mjsHandled = true;
     res.mjsError = { message: 'not allowed' };
     next();
   };
 
+  // this will create routers for the express app.
   const routerCreator = (method, path, action, handler) => {
     router[method](
       path,
@@ -40,6 +43,7 @@ module.exports = (config, hooks) => {
 
   /* Create an object. */
   routerCreator('post', '/', CREATE, async (req, res, next) => {
+    req.mjsHandled = true;
     if (config.createValidator) {
       res.mjsError = config.createValidator(req.body);
       if (res.mjsError) {
@@ -52,6 +56,7 @@ module.exports = (config, hooks) => {
 
   /* Get All Objects by filter */
   routerCreator('get', '/', GET_ALL, async (req, res, next) => {
+    req.mjsHandled = true;
     try {
       const filter = JSON.parse(req.get('filter') || '{}');
       const populate = req.get('populate') || '';
@@ -65,6 +70,7 @@ module.exports = (config, hooks) => {
 
   /* Get one Objects by filter */
   routerCreator('get', '/one', GET_ONE, async (req, res, next) => {
+    req.mjsHandled = true;
     try {
       const filter = JSON.parse(req.get('filter') || '{}');
       const populate = req.get('populate') || '';
@@ -78,6 +84,7 @@ module.exports = (config, hooks) => {
 
   /* Find By Id */
   routerCreator('get', '/:id', GET_BY_ID, async (req, res, next) => {
+    req.mjsHandled = true;
     try {
       const id = req.params.id || '';
       const populate = req.get('populate') || '';
@@ -91,6 +98,7 @@ module.exports = (config, hooks) => {
 
   /* Update by query */
   routerCreator('patch', '/', UPDATE, async (req, res, next) => {
+    req.mjsHandled = true;
     const filter = JSON.parse(req.get('filter') || '{}');
     [res.mjsError, res.mjsResult] = await to(controller.editOne(filter, req.body));
     next();
@@ -98,6 +106,7 @@ module.exports = (config, hooks) => {
 
   /* Update by Id */
   routerCreator('patch', '/:id', UPDATE_BY_ID, async (req, res, next) => {
+    req.mjsHandled = true;
     const id = req.params.id || '';
     [res.mjsError, res.mjsResult] = await to(controller.editById(id, req.body));
     next();
@@ -105,6 +114,7 @@ module.exports = (config, hooks) => {
 
   /* delete by query */
   routerCreator('delete', '/', DELETE, async (req, res, next) => {
+    req.mjsHandled = true;
     const filter = JSON.parse(req.get('filter') || '{}');
     [res.mjsError, res.mjsResult] = await to(controller.removeOne(filter));
     next();
@@ -112,6 +122,7 @@ module.exports = (config, hooks) => {
 
   /* Update by Id */
   routerCreator('delete', '/:id', DELETE_BY_ID, async (req, res, next) => {
+    req.mjsHandled = true;
     const id = req.params.id || '';
     [res.mjsError, res.mjsResult] = await to(controller.removeById(id));
     next();

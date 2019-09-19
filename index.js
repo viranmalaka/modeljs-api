@@ -2,6 +2,7 @@ const configParse = require('./util/config-parse');
 const responseGen = require('./util/response-generator');
 const indexRoute = require('./routes/index');
 const baseRoute = require('./routes/base-model-router');
+const authRoute = require('./routes/users-router');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const CONST = require('./util/const');
@@ -23,6 +24,16 @@ const init = (app, config, hooks) => {
   // pre generic hook
   if (hooks && hooks.generic && hooks.generic.pre) {
     app.use(hooks.generic.pre);
+  }
+
+  app.use((req, res, next) => {
+    req.mjsHandled = false;
+    next();
+  });
+
+  // authentication routes
+  if(config.auth.enableAuth) {
+    app.use(`${pathStart}/user`, authRoute({}))
   }
 
   // model vise routes

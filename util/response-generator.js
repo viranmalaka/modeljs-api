@@ -1,5 +1,6 @@
 module.exports = {
   success: (req, res, next) => {
+    if (!req.mjsHandled) return next();
     if (res.mjsResult) {
       res.jsonp({
         success: true,
@@ -10,7 +11,8 @@ module.exports = {
     }
     next();
   },
-  error: (req, res) => {
+  error: (req, res, next) => {
+    if (!req.mjsHandled) return next();
     if (res.mjsError) {
       res.jsonp({
         success: false,

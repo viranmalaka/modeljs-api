@@ -25,6 +25,7 @@ module.exports = (config) => {
     obj[key] = {
       type: getType(data.type),
       required: data.required || false,
+      ...data,
     };
 
     if (data.type && data.type.ref && typeof data.type.ref === 'string') {

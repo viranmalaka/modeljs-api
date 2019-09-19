@@ -4,7 +4,7 @@ module.exports = (config) => {
     routePrefix: config.routePrefix || 'api',
     enableCors: config.enableCors !== false,
     auth: {
-      enableAuth: config.enableAuth || false,
+      enableAuth: config.auth && config.auth.enable|| false,
     },
     models: config.models.map(m => {
       return {

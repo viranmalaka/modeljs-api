@@ -30,6 +30,7 @@ TODO
   - [ ] Roll based endpoint access
   - [ ] Roll based keys reading
   - [ ] Roll based keys writing
+  - [ ] config to define which actions are auth request and which are not.
   
  - Add Hooks
   - [x] specify a request and add pre and post hooks.
@@ -40,3 +41,6 @@ TODO
   
  - Additional Configs
   - [ ] Take Order name from config
+  
+ - Other
+  - [ ] Add the automatic key hiding feature in mongoose for password
