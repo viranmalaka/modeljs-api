@@ -1,5 +1,6 @@
 module.exports = (config) => {
   return {
+    dbName: config.dbName || 'mjs-api-db',
     apiVersion: config.apiVersion || 'v1',
     routePrefix: config.routePrefix || 'api',
     enableCors: config.enableCors !== false,

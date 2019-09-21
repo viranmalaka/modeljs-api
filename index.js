@@ -16,7 +16,7 @@ const init = (app, config, hooks) => {
 
   // MongoDB configurations
   mongoose.Promise = global.Promise;
-  mongoose.connect('mongodb://localhost:27017/api-tester', { useNewUrlParser: true, useUnifiedTopology: true });
+  mongoose.connect(`mongodb://localhost:27017/${config.dbName}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
   const pathStart = `/${config.routePrefix}/${config.apiVersion}`;
   app.use(pathStart, indexRoute);
