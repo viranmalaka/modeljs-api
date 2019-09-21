@@ -18,6 +18,8 @@ module.exports = (config) => {
         shape: m.shape,
         allowedActions: m.allowedActions || [],
         notAllowedActions: m.notAllowedActions || [],
+        privateActions: m.privateActions || [],
+        allPrivate: m.allPrivate || false,
       }
     }),
   }

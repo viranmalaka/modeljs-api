@@ -23,14 +23,18 @@ TODO
   - [x] Delete by a query
   
 - Authentication
-  - [ ] Sign Up
-  - [ ] Log In
+  - [x] Sign Up
+  - [x] Log In
+  - [x] Private actions
+  - [x] allPrivate flag
   - [ ] Password reset
   - [ ] Roll definition
   - [ ] Roll based endpoint access
   - [ ] Roll based keys reading
   - [ ] Roll based keys writing
   - [ ] config to define which actions are auth request and which are not.
+  - [ ] create admin with a secret code in header
+  
   
  - Add Hooks
   - [x] specify a request and add pre and post hooks.
@@ -43,4 +47,4 @@ TODO
   - [ ] Take Order name from config
   
  - Other
-  - [ ] Add the automatic key hiding feature in mongoose for password
+  - [x] Add the automatic key hiding feature in mongoose for password

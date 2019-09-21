@@ -4,6 +4,8 @@ const bycrypt = require('bcryptjs');
 const baseModel = require('../model/user-model');
 const to = require('../util/to');
 
+const SECRET = 'SHOOOOO';
+
 class UserController {
   constructor(config) {
     this.User = baseModel({});
@@ -12,7 +14,6 @@ class UserController {
 
   async createUser(data) {
     const [err, user] = await to(this.User.findOne({ username: data.username }));
-    console.log(err, user);
     if (err) return Promise.reject(err);
     if (user) {
       return Promise.reject('User Name Already Exist');
@@ -33,7 +34,11 @@ class UserController {
 
     if (isMatch) {
       return new Promise((resolve, reject) => {
-        jwt.sign(user._doc, 'HASH IS HERE', { expiresIn: '10h' }, (err3, token) => {
+        const encryptObject = {
+          _id: user._doc._id,
+          username: user._doc.username,
+        };
+        jwt.sign(encryptObject, SECRET, { expiresIn: '10h' }, (err3, token) => {
           if (err3) reject(err3);
           delete user.password;
           resolve({ token, user });
@@ -42,6 +47,16 @@ class UserController {
     } else {
       return Promise.reject('Invalid Password');
     }
+  }
+
+  verifyToken(token) {
+    return new Promise((resolve, reject) => {
+      jwt.verify(token, SECRET, (err, data) => {
+        // verify the given token
+        if (err) return reject(err);
+        resolve(data);
+      });
+    });
   }
 }
 

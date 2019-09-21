@@ -28,10 +28,30 @@ module.exports = (config, hooks) => {
 
   // this will create routers for the express app.
   const routerCreator = (method, path, action, handler) => {
+
+    const noPermissionMiddleware = (req, res, next) => {
+      req.mjsHandled = true;
+      res.mjsError = { code: 401, message: 'No Permission' };
+      next();
+    };
+
+    const authActionMiddleware = (handler) => {
+      return (req, res, next) => {
+        if(config.allPrivate || config.privateActions.indexOf(action) > -1) {
+          if (req.isAuthenticated) {
+            return handler(req, res, next);
+          } else {
+            return noPermissionMiddleware(req, res, next);
+          }
+        }
+        return handler(req, res, next);
+      }
+    };
+
     router[method](
       path,
       modelHooks(`${action}-pre`),
-      allowedAction(action, config.allowedActions, config.notAllowedActions) ? handler : notAllowedMiddleware,
+      allowedAction(action, config.allowedActions, config.notAllowedActions) ? authActionMiddleware(handler) : notAllowedMiddleware,
       modelHooks(`${action}-post`),
     );
   };

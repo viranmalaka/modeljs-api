@@ -33,7 +33,8 @@ const init = (app, config, hooks) => {
 
   // authentication routes
   if(config.auth.enableAuth) {
-    app.use(`${pathStart}/user`, authRoute({}))
+    app.use(authRoute.authMiddleware);
+    app.use(`${pathStart}/user`, authRoute.authRouter({}));
   }
 
   // model vise routes

@@ -1,12 +1,11 @@
 const express = require('express');
 const AuthController = require('../controller/auth-controller');
 const to = require('../util/to');
+let authController = null;
 
-module.exports = (config) => {
+const authRouter = (config) => {
   const router = express.Router();
-  const authController = new AuthController(config);
-  console.log('auth router');
-
+  authController = new AuthController(config);
   router.post('/signup', async (req, res, next) => {
     req.mjsHandled = true;
     [res.mjsError, res.mjsResult] = await to(authController.createUser(req.body));
@@ -20,4 +19,26 @@ module.exports = (config) => {
   });
 
   return router;
+};
+
+const authMiddleware = async (req, res, next) => {
+  const token = req.get('token'); // get the token data from the header
+  if (token) {
+    const [err, user] = await to(authController.verifyToken(token));
+    if (err) {
+      req.isAuthenticated = false;
+      req.user = null;
+    } else {
+      req.isAuthenticated = true;
+      req.user = user;
+    }
+  } else {
+    res.mjsError = { message: 'No Token Found' };
+  }
+  next();
+};
+
+module.exports = {
+  authMiddleware,
+  authRouter,
 };
