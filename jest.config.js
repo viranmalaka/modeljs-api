@@ -13,4 +13,5 @@ module.exports = {
   moduleDirectories: ['node_modules'],
   testPathIgnorePatterns: ['/node_modules/'],
   testEnvironment: 'node',
+  collectCoverage: true,
 };
