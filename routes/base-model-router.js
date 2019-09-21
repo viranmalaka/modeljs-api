@@ -31,7 +31,7 @@ module.exports = (config, hooks) => {
 
     const noPermissionMiddleware = (req, res, next) => {
       req.mjsHandled = true;
-      res.mjsError = { code: 401, message: 'No Permission' };
+      res.mjsError = res.mjsError || { code: 401, message: 'No Permission' };
       next();
     };
 

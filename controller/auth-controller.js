@@ -8,7 +8,7 @@ const SECRET = 'SHOOOOO';
 
 class UserController {
   constructor(config) {
-    this.User = baseModel({});
+    this.User = baseModel(config);
     this.config = config;
   }
 

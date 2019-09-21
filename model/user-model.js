@@ -15,7 +15,8 @@ module.exports = (config) => {
         type: String,
         require: true,
         select: false,
-      }
+      },
+      ...config.shape
     }
   }));
 

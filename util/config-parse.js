@@ -4,9 +4,10 @@ module.exports = (config) => {
     routePrefix: config.routePrefix || 'api',
     enableCors: config.enableCors !== false,
     auth: {
-      enableAuth: config.auth && config.auth.enable|| false,
+      enableAuth: (config.auth && config.auth.enable) || false,
+      shape: (config.auth && config.auth.shape) || {},
     },
-    models: config.models.map(m => {
+    models: config.models.map((m) => {
       return {
         name: m.name,
         path: m.path || m.name.lowerCase(),
@@ -20,7 +21,7 @@ module.exports = (config) => {
         notAllowedActions: m.notAllowedActions || [],
         privateActions: m.privateActions || [],
         allPrivate: m.allPrivate || false,
-      }
+      };
     }),
-  }
+  };
 };
