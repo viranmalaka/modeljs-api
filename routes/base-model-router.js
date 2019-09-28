@@ -87,9 +87,10 @@ module.exports = (config, hooks) => {
     req.mjsHandled = true;
     try {
       const filter = JSON.parse(req.get('filter') || '{}');
+      const complexPopulate = JSON.parse(req.get('complexPopulate') || 'null');
       const populate = req.get('populate') || '';
       const select = req.get('select') || '';
-      [res.mjsError, res.mjsResult] = await to(controller.find(filter, select, populate));
+      [res.mjsError, res.mjsResult] = await to(controller.find(filter, select, complexPopulate || populate));
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = 'Filter Parse Error' + e;

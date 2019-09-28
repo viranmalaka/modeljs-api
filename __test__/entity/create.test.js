@@ -126,6 +126,17 @@ describe('Create Models', () => {
           },
         },
         notAllowedActions: [CREATE]
+      },
+      {
+        name: 'Model8',
+        path: 'model8-conflict-allowed',
+        shape: {
+          fieldNumber: {
+            type: Number
+          },
+        },
+        notAllowedActions: [CREATE],
+        allowedActions: [CREATE]
       }
     ],
   }, {
@@ -330,6 +341,19 @@ describe('Create Models', () => {
     expect(res.body).toHaveProperty('error');
     expect(res.body.success).toBeFalsy();
     expect(res.body.error.message).toEqual('not allowed');
+    done();
+  });
+
+  it('should allow action if create is in both arrays', async (done) => {
+    const res = await request(app)
+      .post('/api/v1/model8-conflict-allowed')
+      .send({ fieldNumber: 10});
+
+    expect(res.statusCode).toEqual(201);
+    expect(res.body).toHaveProperty('success');
+    expect(res.body).toHaveProperty('result');
+    expect(res.body.success).toBeTruthy();
+    expect(res.body.result.fieldNumber).toEqual(10);
     done();
   });
 });
