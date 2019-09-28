@@ -23,6 +23,7 @@ module.exports = (config, hooks) => {
   const notAllowedMiddleware = (req, res, next) => {
     req.mjsHandled = true;
     res.mjsError = { message: 'not allowed' };
+    res.mjsResStatus = 403;
     next();
   };
 
@@ -32,6 +33,7 @@ module.exports = (config, hooks) => {
     const noPermissionMiddleware = (req, res, next) => {
       req.mjsHandled = true;
       res.mjsError = res.mjsError || { code: 401, message: 'No Permission' };
+      res.mjsResStatus = 401;
       next();
     };
 
@@ -67,10 +69,16 @@ module.exports = (config, hooks) => {
     if (config.createValidator) {
       res.mjsError = config.createValidator(req.body);
       if (res.mjsError) {
+        res.mjsResStatus = 400;
         return next();
       }
     }
     [res.mjsError, res.mjsResult] = await to(controller.create(req.body));
+    if (res.mjsError) {
+      res.mjsResStatus = 400;
+    } else {
+      res.mjsResStatus = 201;
+    }
     next();
   });
 
@@ -83,6 +91,7 @@ module.exports = (config, hooks) => {
       const select = req.get('select') || '';
       [res.mjsError, res.mjsResult] = await to(controller.find(filter, select, populate));
     } catch (e) {
+      res.mjsResStatus = 400;
       res.mjsError = 'Filter Parse Error' + e;
     }
     next();
@@ -97,6 +106,7 @@ module.exports = (config, hooks) => {
       const select = req.get('select') || '';
       [res.mjsError, res.mjsResult] = await to(controller.findOne(filter, select, populate));
     } catch (e) {
+      res.mjsResStatus = 400;
       res.mjsError = 'Filter Parse Error' + e;
     }
     next();
@@ -111,6 +121,7 @@ module.exports = (config, hooks) => {
       const select = req.get('select') || '';
       [res.mjsError, res.mjsResult] = await to(controller.findById(id, select, populate));
     } catch (e) {
+      res.mjsResStatus = 400;
       res.mjsError = 'Filter Parse Error' + e;
     }
     next();
@@ -121,6 +132,9 @@ module.exports = (config, hooks) => {
     req.mjsHandled = true;
     const filter = JSON.parse(req.get('filter') || '{}');
     [res.mjsError, res.mjsResult] = await to(controller.editOne(filter, req.body));
+    if (res.mjsError) {
+      res.mjsResStatus = 304;
+    }
     next();
   });
 
@@ -129,6 +143,9 @@ module.exports = (config, hooks) => {
     req.mjsHandled = true;
     const id = req.params.id || '';
     [res.mjsError, res.mjsResult] = await to(controller.editById(id, req.body));
+    if (res.mjsError) {
+      res.mjsResStatus = 304;
+    }
     next();
   });
 
@@ -137,6 +154,9 @@ module.exports = (config, hooks) => {
     req.mjsHandled = true;
     const filter = JSON.parse(req.get('filter') || '{}');
     [res.mjsError, res.mjsResult] = await to(controller.removeOne(filter));
+    if (res.mjsError) {
+      res.mjsResStatus = 304;
+    }
     next();
   });
 
@@ -145,6 +165,9 @@ module.exports = (config, hooks) => {
     req.mjsHandled = true;
     const id = req.params.id || '';
     [res.mjsError, res.mjsResult] = await to(controller.removeById(id));
+    if (res.mjsError) {
+      res.mjsResStatus = 304;
+    }
     next();
   });
 

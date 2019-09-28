@@ -1,6 +1,9 @@
 module.exports = {
   collectCoverageFrom: [
-    '!__test__/**/*',
+    'controller/**/*',
+    'model/**/*',
+    'routes/**/*',
+    'util/**/*'
   ],
   coverageThreshold: {
     global: {

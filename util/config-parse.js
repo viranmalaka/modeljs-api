@@ -22,6 +22,7 @@ module.exports = (config) => {
         notAllowedActions: m.notAllowedActions || [],
         privateActions: m.privateActions || [],
         allPrivate: m.allPrivate || false,
+        createValidator: m.createValidator || false,
       };
     }),
   };
