@@ -16,7 +16,7 @@ TODO
 - Edit Models (PUT and PATCH)
   - [x] Edit by id 
   - [x] Edit by a query
-  - [ ] Add the validator
+  - [ ] Add the validator (# still pre hooks can be used to archive this)
 
 - Delete Models (DELETE)
   - [x] Delete by id 
@@ -40,11 +40,11 @@ TODO
   - [x] specify a request and add pre and post hooks.
   
  - Block actions
-  - [ ] Block specific action for specific model. 
+  - [x] Block specific action for specific model. 
   ``If both allowed set and not allowed set is there, allowed set is prioritiesed``
   
  - Additional Configs
-  - [ ] Take Order name from config
+  - [x] Take database name from config
   
  - Other
   - [x] Add the automatic key hiding feature in mongoose for password
