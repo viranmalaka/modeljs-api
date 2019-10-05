@@ -29,7 +29,6 @@ module.exports = (config, hooks) => {
 
   // this will create routers for the express app.
   const routerCreator = (method, path, action, handler) => {
-
     const noPermissionMiddleware = (req, res, next) => {
       req.mjsHandled = true;
       res.mjsError = res.mjsError || { code: 401, message: 'No Permission' };
@@ -39,7 +38,7 @@ module.exports = (config, hooks) => {
 
     const authActionMiddleware = (handler) => {
       return (req, res, next) => {
-        if(config.allPrivate || config.privateActions.indexOf(action) > -1) {
+        if (config.allPrivate || config.privateActions.indexOf(action) > -1) {
           if (req.isAuthenticated) {
             return handler(req, res, next);
           } else {
@@ -47,13 +46,15 @@ module.exports = (config, hooks) => {
           }
         }
         return handler(req, res, next);
-      }
+      };
     };
 
     router[method](
       path,
       modelHooks(`${action}-pre`),
-      allowedAction(action, config.allowedActions, config.notAllowedActions) ? authActionMiddleware(handler) : notAllowedMiddleware,
+      allowedAction(action, config.allowedActions, config.notAllowedActions)
+        ? authActionMiddleware(handler)
+        : notAllowedMiddleware,
       modelHooks(`${action}-post`),
     );
   };
@@ -93,7 +94,23 @@ module.exports = (config, hooks) => {
       [res.mjsError, res.mjsResult] = await to(controller.find(filter, select, complexPopulate || populate));
     } catch (e) {
       res.mjsResStatus = 400;
-      res.mjsError = 'Filter Parse Error' + e;
+      res.mjsError = { message: 'JSON Parse Error ' + e };
+    }
+    next();
+  });
+
+
+  /* Find By Id */
+  routerCreator('get', '/:id', GET_BY_ID, async (req, res, next) => {
+    req.mjsHandled = true;
+    try {
+      const id = req.params.id || '';
+      const populate = req.get('populate') || '';
+      const select = req.get('select') || '';
+      [res.mjsError, res.mjsResult] = await to(controller.findById(id, select, populate));
+    } catch (e) {
+      res.mjsResStatus = 400;
+      res.mjsError = { message: 'JSON Parse Error ' + e };
     }
     next();
   });
@@ -108,22 +125,7 @@ module.exports = (config, hooks) => {
       [res.mjsError, res.mjsResult] = await to(controller.findOne(filter, select, populate));
     } catch (e) {
       res.mjsResStatus = 400;
-      res.mjsError = 'Filter Parse Error' + e;
-    }
-    next();
-  });
-
-  /* Find By Id */
-  routerCreator('get', '/:id', GET_BY_ID, async (req, res, next) => {
-    req.mjsHandled = true;
-    try {
-      const id = req.params.id || '';
-      const populate = req.get('populate') || '';
-      const select = req.get('select') || '';
-      [res.mjsError, res.mjsResult] = await to(controller.findById(id, select, populate));
-    } catch (e) {
-      res.mjsResStatus = 400;
-      res.mjsError = 'Filter Parse Error' + e;
+      res.mjsError = { message: 'JSON Parse Error ' + e };
     }
     next();
   });
