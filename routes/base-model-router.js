@@ -17,7 +17,7 @@ const {
 module.exports = (config, hooks) => {
   const router = express.Router();
   const controller = new baseController(config);
-  const modelHooks = hookHandler.modelPreHook(hooks);
+  const modelHooks = hookHandler.modelHook(hooks);
 
   // this middleware will handle if an action is blocked by the config
   const notAllowedMiddleware = (req, res, next) => {

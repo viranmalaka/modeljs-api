@@ -9,7 +9,7 @@ const {
   DELETE,
 } = require('../util/const').ACTIONS;
 
-module.exports.modelPreHook = (hook) => {
+module.exports.modelHook = (hook) => {
   let middleware = (req, res, next) => {
     next();
   };

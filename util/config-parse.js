@@ -5,6 +5,7 @@ module.exports = (config) => {
     routePrefix: config.routePrefix || 'api',
     enableCors: config.enableCors !== false,
     auth: {
+      adminKey: (config.auth && config.auth.adminKey) || null,
       enableAuth: (config.auth && config.auth.enable) || false,
       shape: (config.auth && config.auth.shape) || {},
     },

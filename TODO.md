@@ -32,8 +32,9 @@ TODO
   - [ ] Roll based endpoint access
   - [ ] Roll based keys reading
   - [ ] Roll based keys writing
-  - [ ] config to define which actions are auth request and which are not.
-  - [ ] create admin with a secret code in header
+  - [x] config to define which actions are auth request and which are not.
+  - [x] create admin with a secret code in header
+  - [x] Sign Up pre hook
   
   
  - Add Hooks

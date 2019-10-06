@@ -37,6 +37,7 @@ class UserController {
         const encryptObject = {
           _id: user._doc._id,
           username: user._doc.username,
+          userRole: user._doc.userRole,
         };
         jwt.sign(encryptObject, SECRET, { expiresIn: '10h' }, (err3, token) => {
           if (err3) reject(err3);
