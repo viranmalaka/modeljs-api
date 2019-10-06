@@ -1,6 +1,6 @@
-#modeljs-api
+# modeljs-api
 
-###Configuration
+### Configuration
 
 1. Models Configurations
 2. Hooks Configurations
