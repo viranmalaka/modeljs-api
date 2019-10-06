@@ -105,9 +105,10 @@ module.exports = (config, hooks) => {
     req.mjsHandled = true;
     try {
       const id = req.params.id || '';
+      const complexPopulate = JSON.parse(req.get('complexPopulate') || 'null');
       const populate = req.get('populate') || '';
       const select = req.get('select') || '';
-      [res.mjsError, res.mjsResult] = await to(controller.findById(id, select, populate));
+      [res.mjsError, res.mjsResult] = await to(controller.findById(id, select, complexPopulate || populate));
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = { message: 'JSON Parse Error ' + e };
@@ -120,9 +121,10 @@ module.exports = (config, hooks) => {
     req.mjsHandled = true;
     try {
       const filter = JSON.parse(req.get('filter') || '{}');
+      const complexPopulate = JSON.parse(req.get('complexPopulate') || 'null');
       const populate = req.get('populate') || '';
       const select = req.get('select') || '';
-      [res.mjsError, res.mjsResult] = await to(controller.findOne(filter, select, populate));
+      [res.mjsError, res.mjsResult] = await to(controller.findOne(filter, select, complexPopulate || populate));
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = { message: 'JSON Parse Error ' + e };

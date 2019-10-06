@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-auto-increment');
 const Schema = mongoose.Schema;
 
-module.exports = (config) => {
+module.exports = (authConfig) => {
   const schema = new Schema(createModelByConfig({
     shape: {
       username: {
@@ -16,7 +16,11 @@ module.exports = (config) => {
         require: true,
         select: false,
       },
-      ...config.shape
+      userRole: {
+        type: Number,
+        default: 0,
+      },
+      ...authConfig.shape
     }
   }));
 

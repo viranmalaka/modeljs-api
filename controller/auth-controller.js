@@ -7,9 +7,9 @@ const to = require('../util/to');
 const SECRET = 'SHOOOOO';
 
 class UserController {
-  constructor(config) {
-    this.User = baseModel(config);
-    this.config = config;
+  constructor(authConfig) {
+    this.User = baseModel(authConfig);
+    this.config = authConfig;
   }
 
   async createUser(data) {

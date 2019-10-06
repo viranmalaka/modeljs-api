@@ -3,13 +3,16 @@ const AuthController = require('../controller/auth-controller');
 const to = require('../util/to');
 let authController = null;
 
-const authRouter = (config) => {
+const authRouter = (authConfigs) => {
   const router = express.Router();
-  authController = new AuthController(config);
-  
+  authController = new AuthController(authConfigs);
+
   router.post('/signup', async (req, res, next) => {
     req.mjsHandled = true;
     [res.mjsError, res.mjsResult] = await to(authController.createUser(req.body));
+    if (res.mjsResult) {
+      res.mjsResult.password = undefined;
+    }
     next();
   });
 
