@@ -1,5 +1,69 @@
 # modeljs-api
 
+### Introduction
+
+ModelJS API is a framework that make the ExpressJS developer life easier. When creating API you know 
+how hard it was to create each route to each entity and validate them when creating, refine them when
+retrieving. Same code repeat every single time and the authentication is a headache. 
+
+But in the ModelJS API, we provide a simple configurable framework. Enable authentication to your server is 
+just 5 lines of code in the config object. 
+
+Not like in LoopBackJS, the configuration is simple and easy to understand. The hooks feature make the api more
+stronger and customizable as the developer needs. By default this provides token base authentication.
+
+### Features
+ 1. ExpressJS, MongoDB, mongoose, mongoose-auto-increment, ExpressJS cors.
+ 2. Token based authentication with jwt token. Admin account can be created with adminKey
+ 3. Models can be shaped as they way in mongoose schema
+ 4. user model can be extend and by default username, password, userRole key is there
+ 5. api path can be configurable.
+ 6. Hooks is a strong feature. it can be used as middleware when request processing.
+ 7. if auth enables, in hooks you can read the user and do the needful
+ 8. Route can be protected by `allowedRoute` and `notAllowedRoutes`
+ 9. Actions can be protected by the authentication. Public and private routes.
+ 
+10. #### Future goals
+ - move to MySQL and other DB as well
+ - role based action definitions.
+ - inbuilt password reset and email sending
+ 
+### How to integrate to your express server
+1. Create basic express app as bellow
+
+```javascript
+const express = require('express');
+const logger = require('morgan');
+
+const modelJS = require('modlejs-api');
+
+const config = require('./config');
+const hooks = require('./hooks');
+const app = express();
+
+// additional logs 
+app.use(logger('dev'));
+
+// Define the basic json parse middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// initiate ModelJS application
+modelJS(app, config, hooks);
+
+// catch 404 and forward to error handler
+app.use((req, res, next) => {
+  next({test: 'Not Found', status: 404});
+});
+
+// error handler
+app.use((err, req, res) => {
+  res.status(err.status || 500).jsonp(err);
+});
+
+module.exports = app;
+```
+ 
 ### Configuration
 
 1. Models Configurations
