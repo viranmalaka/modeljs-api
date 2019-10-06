@@ -49,3 +49,25 @@ TODO
   
  - Other
   - [x] Add the automatic key hiding feature in mongoose for password
+
+###Testing
+- [x] create 100%
+- [ ] get, getOne, getById (70%)
+- [ ] update, updateById (0%)
+- [ ] delete, deleteById (0%)
+- each one has
+    - logic
+    - hooks
+    - allowed, not allowed request
+    - different filters, selectors, populate, complexPopulate
+    - Error scenarios
+    
+- Authentication
+    - [ ] user create (normal, admins, different roles)
+    - [ ] user create hooks, validations, different user model shapes
+    - [ ] private routes, public routes, allowed actions.
+    - [ ] admin creations, admin create fail scenarios
+    - [ ] password reset
+    - [ ] role base actions
+    - [ ] role base key reading, writing
+
