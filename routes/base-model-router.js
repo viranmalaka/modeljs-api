@@ -12,6 +12,7 @@ const {
   GET_BY_ID,
   UPDATE,
   UPDATE_BY_ID,
+  COUNT,
 } = require('../util/const').ACTIONS;
 
 module.exports = (config, hooks) => {
@@ -91,14 +92,21 @@ module.exports = (config, hooks) => {
       const complexPopulate = JSON.parse(req.get('complexPopulate') || 'null');
       const populate = req.get('populate') || '';
       const select = req.get('select') || '';
-      [res.mjsError, res.mjsResult] = await to(controller.find(filter, select, complexPopulate || populate));
+      const sortBy = req.get('sortBy') || '';
+      const paginate = JSON.parse(req.get('paginate') || null);
+      if (paginate) {
+        [res.mjsError, res.mjsResult] = await to(
+          controller.paginate(filter, select, complexPopulate || populate, paginate),
+        );
+      } else {
+        [res.mjsError, res.mjsResult] = await to(controller.find(filter, select, complexPopulate || populate));
+      }
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = { message: 'JSON Parse Error ' + e };
     }
     next();
   });
-
 
   /* Find By Id */
   routerCreator('get', '/:id', GET_BY_ID, async (req, res, next) => {
@@ -125,6 +133,19 @@ module.exports = (config, hooks) => {
       const populate = req.get('populate') || '';
       const select = req.get('select') || '';
       [res.mjsError, res.mjsResult] = await to(controller.findOne(filter, select, complexPopulate || populate));
+    } catch (e) {
+      res.mjsResStatus = 400;
+      res.mjsError = { message: 'JSON Parse Error ' + e };
+    }
+    next();
+  });
+
+  /* Get count of the objects*/
+  routerCreator('get', '/count', COUNT, async (req, res, next) => {
+    req.mjsHandled = true;
+    try {
+      const filter = JSON.parse(req.get('filter') || '{}');
+      [res.mjsError, res.mjsResult] = await to(controller.count(filter));
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = { message: 'JSON Parse Error ' + e };

@@ -12,6 +12,8 @@ TODO
   - [x] get with selected columns
   - [x] get by id
   - [x] find one by a query
+  - [x] get full count
+  - [x] introduce pagination.
 
 - Edit Models (PUT and PATCH)
   - [x] Edit by id 

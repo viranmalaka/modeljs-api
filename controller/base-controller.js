@@ -15,6 +15,14 @@ class BaseController {
     return this.Model.find(filter, select, {populate: populate});
   }
 
+  paginate(filter, select, populate, paginateInfo) {
+    return this.Model.paginate(filter, {select, populate: populate, ...paginateInfo});
+  }
+
+  count(filter) {
+    return this.Model.count(filter);
+  }
+
   findOne(filter, select, populate) {
     return this.Model.findOne(filter, select, {populate: populate});
   }

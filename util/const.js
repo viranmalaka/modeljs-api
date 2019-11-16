@@ -11,5 +11,6 @@ module.exports = {
     UPDATE_BY_ID: 'updateById',
     DELETE: 'delete',
     DELETE_BY_ID: 'deleteById',
+    COUNT: 'count',
   },
 };
