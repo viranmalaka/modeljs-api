@@ -41,6 +41,12 @@ module.exports = (config, hooks) => {
       return (req, res, next) => {
         if (config.allPrivate || config.privateActions.indexOf(action) > -1) {
           if (req.isAuthenticated) {
+            const role = req.user.userRole;
+            if (role && config.blockActionByRole[role]) {
+              return config.blockActionByRole[role].indexOf(action) < 0
+                ? handler(req, res, next)
+                : noPermissionMiddleware(req, res, next);
+            }
             return handler(req, res, next);
           } else {
             return noPermissionMiddleware(req, res, next);

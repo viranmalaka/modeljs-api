@@ -25,7 +25,7 @@ const authRouter = (authConfigs, signUpHook) => {
     if(req.body.userRole < 0) {
       if (req.get('adminKey') === authConfigs.adminKey ) { // with adminKey can create admins
         return goNext();
-      } else if (req.user && req.user.userRole < 0) { // another admin can create admins
+      } else if (req.isAuthenticated && req.user.userRole < 0) { // another admin can create admins
         return goNext();
       }
       if (req.get('adminKey') !== authConfigs.adminKey || (req.user && req.user.userRole >= 0)) {

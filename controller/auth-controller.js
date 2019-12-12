@@ -25,7 +25,13 @@ class UserController {
   }
 
   async loginUser(data) {
-    const [err, user] = await to(this.User.findOne({ username: data.username }, '+password'));
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    let key = 'username';
+    if (re.test(String(data.username).toLocaleLowerCase())) {
+      key = 'email';
+    }
+    const [err, user] = await to(this.User.findOne({ [key]: data.username }, '+password'));
     if (err) return Promise.reject(err);
     if (!user) return Promise.reject('User Not Found');
 
@@ -42,7 +48,15 @@ class UserController {
         jwt.sign(encryptObject, SECRET, { expiresIn: '10h' }, (err3, token) => {
           if (err3) reject(err3);
           delete user.password;
-          resolve({ token, user });
+          resolve({
+            token,
+            user: {
+              username: user.username,
+              email: user.email,
+              _id: user._id,
+              userRole: user.userRole,
+            },
+          });
         });
       });
     } else {

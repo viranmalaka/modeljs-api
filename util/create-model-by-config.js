@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const getType = (type) => {
   if (typeof type !== 'string') {
     if (type && type.ref && typeof type.ref === 'string') {
-      return  mongoose.Schema.Types.ObjectId;
+      return mongoose.Schema.Types.ObjectId;
     }
     return type;
   }
@@ -19,7 +19,11 @@ module.exports = (config) => {
   const shape = config.shape;
   const obj = {};
 
-  Object.keys(shape).forEach(key => {
+  if(config.mongooseOriginalSchema) {
+    return shape;
+  }
+
+  Object.keys(shape).forEach((key) => {
     const data = shape[key];
 
     obj[key] = {

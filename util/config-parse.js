@@ -19,6 +19,8 @@ module.exports = (config) => {
           startAt: m.autoIncrement && m.autoIncrement.startAt,
         },
         shape: m.shape,
+        mongooseOriginalSchema: m.mongooseOriginalSchema || false,
+        blockActionByRole: m.blockActionByRole || {},
         allowedActions: m.allowedActions || [],
         notAllowedActions: m.notAllowedActions || [],
         privateActions: m.privateActions || [],
