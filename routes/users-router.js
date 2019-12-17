@@ -44,6 +44,13 @@ const authRouter = (authConfigs, signUpHook) => {
     next();
   });
 
+  router.get('/who', (req, res, next) => {
+    req.mjsHandled = true;
+    res.mjsResult = req.isAuthenticated ? req.user : null;
+    res.mjsResStatus = req.isAuthenticated ? 200 : 401;
+    next();
+  });
+
   return router;
 };
 

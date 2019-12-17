@@ -110,7 +110,7 @@ module.exports = {
         },
       },
       allowedActions: [CREATE],     // if allowed actions is given only create can do. 
-      notAllowedActions: [GET_ALL], // Author model getAll is not allowed
+      blockedActions: [GET_ALL],    // Author model getAll is not allowed
       privateActions: [GET_ALL],    // to access user should be authenticated
       allPrivate: true,             // to ensure all the actions are under authenticated. no need to define private actions 
       createValidator: () => {},    // manual validator function when creating the model

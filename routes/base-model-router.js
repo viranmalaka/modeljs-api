@@ -39,27 +39,35 @@ module.exports = (config, hooks) => {
 
     const authActionMiddleware = (handler) => {
       return (req, res, next) => {
-        if (config.allPrivate || config.privateActions.indexOf(action) > -1) {
+        if (config.allPrivate || config.privateActions.indexOf(action) > -1) { // for private actions
           if (req.isAuthenticated) {
+            // for private route user should be authenticated.
             const role = req.user.userRole;
-            if (role && config.blockActionByRole[role]) {
-              return config.blockActionByRole[role].indexOf(action) < 0
-                ? handler(req, res, next)
-                : noPermissionMiddleware(req, res, next);
+
+            if (role) {
+              if (role < 0) { // for admins
+                return handler(req, res, next);
+              } else  {
+                return allowedAction(action, config.allowedActionByRole[role], config.blockedActionByRole[role]) ?
+                  handler(req, res, next) :
+                  noPermissionMiddleware(req, res, next);
+              }
+            } else {
+              return noPermissionMiddleware(req, res, next);
             }
-            return handler(req, res, next);
           } else {
+            // for private route but not authenticated.
             return noPermissionMiddleware(req, res, next);
           }
         }
-        return handler(req, res, next);
+        return handler(req, res, next); // for non-private action call the handler.
       };
     };
 
     router[method](
       path,
       modelHooks(`${action}-pre`),
-      allowedAction(action, config.allowedActions, config.notAllowedActions)
+      allowedAction(action, config.allowedActions, config.blockedActions)
         ? authActionMiddleware(handler)
         : notAllowedMiddleware,
       modelHooks(`${action}-post`),

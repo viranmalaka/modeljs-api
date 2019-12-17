@@ -37,7 +37,7 @@ const init = (app, config, hooks) => {
 
   // authentication routes
   if (config.auth.enableAuth) {
-    app.use(authRoute.authMiddleware);
+    app.use(pathStart, authRoute.authMiddleware);
     app.use(`${pathStart}/user`, authRoute.authRouter(config.auth, hooks && hooks.signUp));
   }
 

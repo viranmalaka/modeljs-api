@@ -125,7 +125,7 @@ describe('Create Models', () => {
             type: Number
           },
         },
-        notAllowedActions: [CREATE]
+        blockedActions: [CREATE]
       },
       {
         name: 'Model8',
@@ -135,7 +135,7 @@ describe('Create Models', () => {
             type: Number
           },
         },
-        notAllowedActions: [CREATE],
+        blockedActions: [CREATE],
         allowedActions: [CREATE]
       }
     ],
