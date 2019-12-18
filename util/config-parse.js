@@ -27,6 +27,13 @@ module.exports = (config) => {
         privateActions: m.privateActions || [],
         allPrivate: m.allPrivate || false,
         createValidator: m.createValidator || false,
+        additionalRoutes: m.additionalRoutes && m.additionalRoutes.map(x => {
+          if(x.method && x.pathPattern && x.actionName && x.handler) {
+            return {...x};
+          } else {
+            throw "invalid additionalRoutes Object";
+          }
+        }),
       };
     }),
   };

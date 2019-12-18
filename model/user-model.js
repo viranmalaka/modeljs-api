@@ -18,7 +18,7 @@ module.exports = (authConfig) => {
       },
       userRole: {
         type: Number,
-        default: 0,
+        default: 1,
       },
       ...authConfig.shape
     }

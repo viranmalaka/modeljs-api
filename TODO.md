@@ -51,6 +51,7 @@ TODO
   
  - Other
   - [x] Add the automatic key hiding feature in mongoose for password
+  - [x] Adding extended routes.
 
 ###Testing
 - [x] create 100%

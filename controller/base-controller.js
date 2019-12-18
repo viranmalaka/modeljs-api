@@ -46,6 +46,10 @@ class BaseController {
   removeOne(query) {
     return this.Model.findOneAndRemove(query);
   }
+
+  getModel() {
+    return this.Model;
+  }
 }
 
 module.exports = BaseController;

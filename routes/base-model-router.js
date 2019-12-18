@@ -79,6 +79,13 @@ module.exports = (config, hooks) => {
     router.use(hooks.generic.pre);
   }
 
+  config.additionalRoutes && config.additionalRoutes.map((routeData) => {
+    routerCreator(routeData.method, routeData.pathPattern, routeData.actionName, async (req, res, next) => {
+      req.mjsHandled = true;
+      routeData.handler(controller.getModel())(req, res, next);
+    })
+  });
+
   /* Create an object. */
   routerCreator('post', '/', CREATE, async (req, res, next) => {
     req.mjsHandled = true;

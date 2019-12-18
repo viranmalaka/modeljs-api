@@ -5,15 +5,15 @@
  *    if not allowed set have give, not allowed set doest not have
  * @param action
  * @param allowedSet
- * @param blockedSed
+ * @param blockedSet
  * @returns {boolean}
  */
-module.exports = (action, allowedSet, blockedSed) => {
+module.exports = (action, allowedSet = [], blockedSet = []) => {
   if (allowedSet.length > 0) {
     return allowedSet.indexOf(action) > -1;
   }
-  if (blockedSed.length > 0) {
-    return blockedSed.indexOf(action) < 0;
+  if (blockedSet.length > 0) {
+    return blockedSet.indexOf(action) < 0;
   }
   return true;
 };
