@@ -18,6 +18,7 @@ module.exports = (config) => {
           field: m.autoIncrement && m.autoIncrement.field,
           startAt: m.autoIncrement && m.autoIncrement.startAt,
         },
+        timestamps: m.timestamps,
         shape: m.shape,
         mongooseOriginalSchema: m.mongooseOriginalSchema || false,
         blockedActionByRole: m.blockedActionByRole || {},

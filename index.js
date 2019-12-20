@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const CONST = require('./util/const');
 
+const metaExport = {};
+
 const init = (app, config, hooks) => {
   config = configParse(config);
 
@@ -38,12 +40,12 @@ const init = (app, config, hooks) => {
   // authentication routes
   if (config.auth.enableAuth) {
     app.use(pathStart, authRoute.authMiddleware);
-    app.use(`${pathStart}/user`, authRoute.authRouter(config.auth, hooks && hooks.signUp));
+    app.use(`${pathStart}/user`, authRoute.authRouter(config.auth, hooks && hooks.signUp, metaExport));
   }
 
   // model vise routes
   config.models.forEach((model) => {
-    app.use(`${pathStart}/${model.path}`, baseRoute(model, hooks.models && hooks.models[model.name]));
+    app.use(`${pathStart}/${model.path}`, baseRoute(model, hooks.models && hooks.models[model.name], metaExport));
   });
 
   // post generic hook
@@ -59,3 +61,4 @@ module.exports = init;
 
 module.exports.CONST = CONST;
 module.exports.MongooseTypes = mongoose.Schema.Types;
+module.exports.Models = metaExport;

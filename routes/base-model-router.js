@@ -15,9 +15,11 @@ const {
   COUNT,
 } = require('../util/const').ACTIONS;
 
-module.exports = (config, hooks) => {
+module.exports = (config, hooks, metaExport) => {
   const router = express.Router();
   const controller = new baseController(config);
+  metaExport[config.name] = controller.getModel();
+
   const modelHooks = hookHandler.modelHook(hooks);
 
   // this middleware will handle if an action is blocked by the config

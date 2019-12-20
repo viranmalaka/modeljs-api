@@ -3,9 +3,10 @@ const AuthController = require('../controller/auth-controller');
 const to = require('../util/to');
 let authController = null;
 
-const authRouter = (authConfigs, signUpHook) => {
+const authRouter = (authConfigs, signUpHook, metaExport) => {
   const router = express.Router();
   authController = new AuthController(authConfigs);
+  metaExport.User = authController.User;
 
   const defaultHook = (req, res, next) => {
     next();
