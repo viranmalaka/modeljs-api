@@ -32,7 +32,7 @@ class BaseController {
   }
 
   editById(id, newData) {
-    return this.Model.findByIdAndUpdate(id, newData);
+    return this.Model.findByIdAndUpdate(id, newData, {new: true});
   }
 
   editOne(query, newData) {

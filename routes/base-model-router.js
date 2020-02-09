@@ -41,18 +41,20 @@ module.exports = (config, hooks, metaExport) => {
 
     const authActionMiddleware = (handler) => {
       return (req, res, next) => {
-        if (config.allPrivate || config.privateActions.indexOf(action) > -1) { // for private actions
+        if (config.allPrivate || config.privateActions.indexOf(action) > -1) {
+          // for private actions
           if (req.isAuthenticated) {
             // for private route user should be authenticated.
             const role = req.user.userRole;
 
             if (role) {
-              if (role < 0) { // for admins
+              if (role < 0) {
+                // for admins
                 return handler(req, res, next);
-              } else  {
-                return allowedAction(action, config.allowedActionByRole[role], config.blockedActionByRole[role]) ?
-                  handler(req, res, next) :
-                  noPermissionMiddleware(req, res, next);
+              } else {
+                return allowedAction(action, config.allowedActionByRole[role], config.blockedActionByRole[role])
+                  ? handler(req, res, next)
+                  : noPermissionMiddleware(req, res, next);
               }
             } else {
               return noPermissionMiddleware(req, res, next);
@@ -81,12 +83,13 @@ module.exports = (config, hooks, metaExport) => {
     router.use(hooks.generic.pre);
   }
 
-  config.additionalRoutes && config.additionalRoutes.map((routeData) => {
-    routerCreator(routeData.method, routeData.pathPattern, routeData.actionName, async (req, res, next) => {
-      req.mjsHandled = true;
-      routeData.handler(controller.getModel())(req, res, next);
-    })
-  });
+  config.additionalRoutes &&
+    config.additionalRoutes.map((routeData) => {
+      routerCreator(routeData.method, routeData.pathPattern, routeData.actionName, async (req, res, next) => {
+        req.mjsHandled = true;
+        routeData.handler(controller.getModel())(req, res, next);
+      });
+    });
 
   /* Create an object. */
   routerCreator('post', '/', CREATE, async (req, res, next) => {
@@ -213,6 +216,16 @@ module.exports = (config, hooks, metaExport) => {
   routerCreator('delete', '/:id', DELETE_BY_ID, async (req, res, next) => {
     req.mjsHandled = true;
     const id = req.params.id || '';
+    if (config.checkUsageBeforeDelete) {
+      for (let i = 0; i < config.checkUsageBeforeDelete.length; i++) {
+        const { model, key } = config.checkUsageBeforeDelete[i];
+        [, results] = await to(metaExport[model].find({ [key]: id }));
+        if (results && results.length > 0) {
+          res.mjsError = { msg: 'Cannot delete, because there are some usages', example: results };
+          return next();
+        }
+      }
+    }
     [res.mjsError, res.mjsResult] = await to(controller.removeById(id));
     if (res.mjsError) {
       res.mjsResStatus = 304;
