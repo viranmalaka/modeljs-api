@@ -142,7 +142,11 @@ module.exports = (config, hooks, metaExport) => {
       const complexPopulate = JSON.parse(req.get('complexPopulate') || 'null');
       const populate = req.get('populate') || '';
       const select = req.get('select') || '';
-      [res.mjsError, res.mjsResult] = await to(controller.findById(id, select, complexPopulate || populate));
+      if (/^[a-f\d]{24}$/i.test(id)) {
+        [res.mjsError, res.mjsResult] = await to(controller.findById(id, select, complexPopulate || populate));
+      } else {
+        [res.mjsError, res.mjsResult] = await to(controller.findOne({ id }, select, complexPopulate || populate));
+      }
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = { message: 'JSON Parse Error ' + e };
