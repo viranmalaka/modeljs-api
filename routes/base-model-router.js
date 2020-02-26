@@ -220,14 +220,25 @@ module.exports = (config, hooks, metaExport) => {
   routerCreator('delete', '/:id', DELETE_BY_ID, async (req, res, next) => {
     req.mjsHandled = true;
     const id = req.params.id || '';
+    const deleteUsages = req.get('delete-usages') || false;
+    let fullResults = {};
     if (config.checkUsageBeforeDelete) {
       for (let i = 0; i < config.checkUsageBeforeDelete.length; i++) {
         const { model, key } = config.checkUsageBeforeDelete[i];
-        [, results] = await to(metaExport[model].find({ [key]: id }));
-        if (results && results.length > 0) {
-          res.mjsError = { msg: 'Cannot delete, because there are some usages', example: results };
-          return next();
-        }
+        const [, results] = await to(metaExport[model].find({ [key]: id }));
+        fullResults = {[model]: results};
+        // TODO error handle
+      }
+      if (fullResults && Object.keys(fullResults).length > 0 && !deleteUsages) {
+        res.mjsError = { msg: 'Cannot delete, because there are some usages', example: fullResults, code: 'NO_DELETE_HAS_USAGES' };
+        return next();
+      }
+    }
+    if (deleteUsages && config.checkUsageBeforeDelete) {
+      for (let i = 0; i < config.checkUsageBeforeDelete.length; i++) {
+        const { model, key } = config.checkUsageBeforeDelete[i];
+        await to(metaExport[model].find({ [key]: id }).remove());
+        // TODO error handle
       }
     }
     [res.mjsError, res.mjsResult] = await to(controller.removeById(id));

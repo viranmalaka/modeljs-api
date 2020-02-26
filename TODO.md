@@ -23,6 +23,8 @@ TODO
 - Delete Models (DELETE)
   - [x] Delete by id 
   - [x] Delete by a query
+  - [x] checkUsageBeforeDelete
+  - [x] override checkUsageBeforeDelete and delete the usages as well.
   
 - Authentication
   - [x] Sign Up
