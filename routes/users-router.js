@@ -56,7 +56,7 @@ const authRouter = (authConfigs, signUpHook, metaExport) => {
 };
 
 const authMiddleware = async (req, res, next) => {
-  const token = req.get('token'); // get the token data from the header
+  const token = req.get('token') || req.query._token; // get the token data from the header
   if (token) {
     const [err, user] = await to(authController.verifyToken(token));
     if (err) {
