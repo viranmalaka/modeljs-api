@@ -9,6 +9,7 @@ module.exports = (config) => {
     name,
     autoIncrement: { enable, filed, startAt },
     timestamps,
+    uniqueKeys,
   } = config;
 
   const schema = new Schema(createModelByConfig(config), { timestamps });
@@ -16,6 +17,10 @@ module.exports = (config) => {
   if (enable) {
     autoIncrement.initialize(mongoose.connection);
     schema.plugin(autoIncrement.plugin, { model: name, field: filed || 'id', startAt: startAt || 0 });
+  }
+
+  if (uniqueKeys) {
+    schema.index(uniqueKeys, { unique: true });
   }
 
   schema.plugin(mongoosePaginate);

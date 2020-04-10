@@ -31,12 +31,12 @@ class BaseController {
     return this.Model.findById(id, select, {populate: populate});
   }
 
-  editById(id, newData) {
-    return this.Model.findByIdAndUpdate(id, newData, {new: true});
+  editById(id, newData, options = {}) {
+    return this.Model.findByIdAndUpdate(id, newData, {new: true, ...options});
   }
 
-  editOne(query, newData) {
-    return this.Model.findOneAndUpdate(query, newData);
+  editOne(query, newData, options) {
+    return this.Model.findOneAndUpdate(query, newData, {new: true, ...options});
   }
 
   removeById(id) {

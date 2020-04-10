@@ -187,7 +187,8 @@ module.exports = (config, hooks, metaExport) => {
   routerCreator('patch', '/', UPDATE, async (req, res, next) => {
     req.mjsHandled = true;
     const filter = JSON.parse(req.get('filter') || '{}');
-    [res.mjsError, res.mjsResult] = await to(controller.editOne(filter, req.body));
+    const options = JSON.parse(req.get('options') || '{}');
+    [res.mjsError, res.mjsResult] = await to(controller.editOne(filter, req.body, options));
     if (res.mjsError) {
       res.mjsResStatus = 304;
     }
@@ -198,7 +199,8 @@ module.exports = (config, hooks, metaExport) => {
   routerCreator('patch', '/:id', UPDATE_BY_ID, async (req, res, next) => {
     req.mjsHandled = true;
     const id = req.params.id || '';
-    [res.mjsError, res.mjsResult] = await to(controller.editById(id, req.body));
+    const options = JSON.parse(req.get('options') || '{}');
+    [res.mjsError, res.mjsResult] = await to(controller.editById(id, req.body, options));
     if (res.mjsError) {
       res.mjsResStatus = 304;
     }

@@ -22,6 +22,7 @@ module.exports = (config) => {
         timestamps: m.timestamps,
         shape: m.shape,
         mongooseOriginalSchema: m.mongooseOriginalSchema || false,
+        uniqueKeys: m.uniqueKeys || false,
         blockedActionByRole: m.blockedActionByRole || {},
         allowedActionByRole: m.allowedActionByRole || {},
         allowedActions: m.allowedActions || [],
