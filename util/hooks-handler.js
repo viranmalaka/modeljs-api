@@ -1,3 +1,4 @@
+const logger = require('./logger');
 const {
   CREATE,
   UPDATE_BY_ID,
@@ -13,40 +14,51 @@ module.exports.modelHook = (hook) => {
   let middleware = (req, res, next) => {
     next();
   };
+  const executeMiddleware = (a, b) => {
+    if (hook && hook[a] && hook[a][b]) {
+      return (req, res, next) => {
+        logger.error(`Executing [${a}] [${b}] hook`);
+        hook && hook[a] && hook[a][b](req, res, next);
+      }
+    }
+    return (req, res, next) => {
+      next();
+    };
+  };
   return (mode) => {
     switch (mode) {
       case `${CREATE}-pre`:
-        return (hook && hook.create && hook.create.pre) || middleware;
+        return executeMiddleware('create', 'pre');
       case `${CREATE}-post`:
-        return (hook && hook.create && hook.create.post) || middleware;
+        return executeMiddleware('create', 'post');
       case `${GET_ALL}-pre`:
-        return (hook && hook.getAll && hook.getAll.pre) || middleware;
+        return executeMiddleware('getAll', 'pre');
       case `${GET_ALL}-post`:
-        return (hook && hook.getAll && hook.getAll.post) || middleware;
+        return executeMiddleware('getAll', 'post');
       case `${GET_ONE}-pre`:
-        return (hook && hook.getOne && hook.getOne.pre) || middleware;
+        return executeMiddleware('getOne', 'pre');
       case `${GET_ONE}-post`:
-        return (hook && hook.getOne && hook.getOne.post) || middleware;
+        return executeMiddleware('getOne', 'post');
       case `${GET_BY_ID}-pre`:
-        return (hook && hook.getById && hook.getById.pre) || middleware;
+        return executeMiddleware('getById', 'pre');
       case `${GET_BY_ID}-post`:
-        return (hook && hook.getById && hook.getById.post) || middleware;
+        return executeMiddleware('getById', 'post');
       case `${UPDATE}-pre`:
-        return (hook && hook.update && hook.update.pre) || middleware;
+        return executeMiddleware('update', 'pre');
       case `${UPDATE}-post`:
-        return (hook && hook.update && hook.update.post) || middleware;
+        return executeMiddleware('update', 'post');
       case `${UPDATE_BY_ID}-pre`:
-        return (hook && hook.updateById && hook.updateById.pre) || middleware;
+        return executeMiddleware('updateById', 'pre');
       case `${UPDATE_BY_ID}-post`:
-        return (hook && hook.updateById && hook.updateById.post) || middleware;
+        return executeMiddleware('updateById', 'post');
       case `${DELETE}-pre`:
-        return (hook && hook.delete && hook.delete.pre) || middleware;
+        return executeMiddleware('delete', 'pre');
       case `${DELETE}-post`:
-        return (hook && hook.delete && hook.delete.post) || middleware;
+        return executeMiddleware('delete', 'post');
       case `${DELETE_BY_ID}-pre`:
-        return (hook && hook.deleteById && hook.deleteById.pre) || middleware;
+        return executeMiddleware('deleteById', 'pre');
       case `${DELETE_BY_ID}-post`:
-        return (hook && hook.deleteById && hook.deleteById.post) || middleware;
+        return executeMiddleware('deleteById', 'post');
       default:
         return middleware;
     }

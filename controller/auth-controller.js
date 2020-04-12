@@ -3,6 +3,7 @@ const bycrypt = require('bcryptjs');
 
 const baseModel = require('../model/user-model');
 const to = require('../util/to');
+const logger = require('../util/logger');
 
 const SECRET = 'SHOOOOO';
 
@@ -14,8 +15,12 @@ class UserController {
 
   async createUser(data) {
     const [err, user] = await to(this.User.findOne({ username: data.username }));
-    if (err) return Promise.reject(err);
+    if (err) {
+      logger.error('User Finding Error', err);
+      return Promise.reject(err);
+    }
     if (user) {
+      logger.error('User Name Already Exists');
       return Promise.reject('User Name Already Exist');
     }
     const salt = await bycrypt.genSalt(10); // generate a salt
@@ -32,11 +37,20 @@ class UserController {
       key = 'email';
     }
     const [err, user] = await to(this.User.findOne({ [key]: data.username }, '+password'));
-    if (err) return Promise.reject(err);
-    if (!user) return Promise.reject('User Not Found');
+    if (err) {
+      logger.error('User finding Error', err);
+      return Promise.reject(err);
+    }
+    if (!user) {
+      logger.error('User Not Found');
+      return Promise.reject('User Not Found');
+    }
 
     const [err2, isMatch] = await to(bycrypt.compare(data.password, user.password));
-    if (err2) return Promise.reject(err2);
+    if (err2){
+      logger.error('Password compare error', err2);
+      return Promise.reject(err2);
+    }
 
     if (isMatch) {
       return new Promise((resolve, reject) => {
@@ -60,6 +74,7 @@ class UserController {
         });
       });
     } else {
+      logger.error('Invalid Password');
       return Promise.reject('Invalid Password');
     }
   }

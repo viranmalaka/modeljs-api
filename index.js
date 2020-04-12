@@ -6,11 +6,13 @@ const authRoute = require('./routes/users-router');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const CONST = require('./util/const');
+const logger = require('./util/logger');
 
 const metaExport = {};
 
 const init = (app, config, hooks) => {
   config = configParse(config);
+  logger.info('Init app with ', config);
 
   if (config.enableCors) {
     app.use(cors()); // cross origin issues
@@ -29,7 +31,10 @@ const init = (app, config, hooks) => {
 
   // pre generic hook
   if (hooks && hooks.generic && hooks.generic.pre) {
-    app.use(hooks.generic.pre);
+    app.use((req, res, next) => {
+      logger.info('Executing Generic Pre Middleware');
+      hooks.generic.pre(req, res, next);
+    });
   }
 
   app.use((req, res, next) => {
@@ -50,7 +55,10 @@ const init = (app, config, hooks) => {
 
   // post generic hook
   if (hooks && hooks.generic && hooks.generic.post) {
-    app.use(hooks.generic.post);
+    app.use((req, res, next) => {
+      logger.info('Executing Generic Post Middleware');
+      hooks.generic.post(req, res, next);
+    });
   }
 
   app.use(responseGen.success);
@@ -62,3 +70,4 @@ module.exports = init;
 module.exports.CONST = CONST;
 module.exports.MongooseTypes = mongoose.Schema.Types;
 module.exports.Models = metaExport;
+module.exports.logger = logger;

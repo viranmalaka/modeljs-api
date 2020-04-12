@@ -3,6 +3,7 @@ const to = require('../util/to');
 const hookHandler = require('../util/hooks-handler');
 const allowedAction = require('../util/allowed-action');
 const express = require('express');
+const logger = require('../util/logger');
 const {
   CREATE,
   DELETE,
@@ -27,6 +28,7 @@ module.exports = (config, hooks, metaExport) => {
     req.mjsHandled = true;
     res.mjsError = { message: 'not allowed' };
     res.mjsResStatus = 403;
+    logger.error('Not Allowed request');
     next();
   };
 
@@ -36,6 +38,7 @@ module.exports = (config, hooks, metaExport) => {
       req.mjsHandled = true;
       res.mjsError = res.mjsError || { code: 401, message: 'No Permission' };
       res.mjsResStatus = 401;
+      logger.error('No Permission request');
       next();
     };
 
@@ -50,6 +53,7 @@ module.exports = (config, hooks, metaExport) => {
             if (role) {
               if (role < 0) {
                 // for admins
+                logger.info(`${config.name} [${method}] Executing`);
                 return handler(req, res, next);
               } else {
                 return allowedAction(action, config.allowedActionByRole[role], config.blockedActionByRole[role])
@@ -68,6 +72,7 @@ module.exports = (config, hooks, metaExport) => {
       };
     };
 
+    logger.info(`Creating [${method.toUpperCase()}] \t ${config.path + path}`);
     router[method](
       path,
       modelHooks(`${action}-pre`),
@@ -80,7 +85,10 @@ module.exports = (config, hooks, metaExport) => {
 
   // pre generic hook
   if (hooks && hooks.generic && hooks.generic.pre) {
-    router.use(hooks.generic.pre);
+    router.use((req, res, next) => {
+      logger.info('executing model pre hook');
+      hooks.generic.pre(req, res, next);
+    });
   }
 
   config.additionalRoutes &&
@@ -97,6 +105,7 @@ module.exports = (config, hooks, metaExport) => {
     if (config.createValidator) {
       res.mjsError = config.createValidator(req.body);
       if (res.mjsError) {
+        logger.error('Customer Create Validation fail');
         res.mjsResStatus = 400;
         return next();
       }
@@ -120,6 +129,7 @@ module.exports = (config, hooks, metaExport) => {
       const select = req.get('select') || '';
       const sortBy = req.get('sortBy') || '';
       const paginate = JSON.parse(req.get('paginate') || null);
+      logger.info('Searching with', {filter, complexPopulate, populate, select, sortBy, paginate});
       if (paginate) {
         [res.mjsError, res.mjsResult] = await to(
           controller.paginate(filter, select, complexPopulate || populate, paginate),
@@ -130,6 +140,7 @@ module.exports = (config, hooks, metaExport) => {
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = { message: 'JSON Parse Error ' + e };
+      logger.error('JSON parse error', e);
     }
     next();
   });
@@ -144,12 +155,15 @@ module.exports = (config, hooks, metaExport) => {
       const select = req.get('select') || '';
       if (/^[a-f\d]{24}$/i.test(id)) {
         [res.mjsError, res.mjsResult] = await to(controller.findById(id, select, complexPopulate || populate));
+        logger.info('get object by _id with ', {complexPopulate, populate, select});
       } else {
         [res.mjsError, res.mjsResult] = await to(controller.findOne({ id }, select, complexPopulate || populate));
+        logger.info('get object by id with ', {complexPopulate, populate, select});
       }
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = { message: 'JSON Parse Error ' + e };
+      logger.error('JSON parse error', e);
     }
     next();
   });
@@ -162,10 +176,12 @@ module.exports = (config, hooks, metaExport) => {
       const complexPopulate = JSON.parse(req.get('complexPopulate') || 'null');
       const populate = req.get('populate') || '';
       const select = req.get('select') || '';
+      logger.info('get one object with ', {complexPopulate, populate, select});
       [res.mjsError, res.mjsResult] = await to(controller.findOne(filter, select, complexPopulate || populate));
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = { message: 'JSON Parse Error ' + e };
+      logger.error('JSON parse error', e);
     }
     next();
   });
@@ -179,6 +195,7 @@ module.exports = (config, hooks, metaExport) => {
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = { message: 'JSON Parse Error ' + e };
+      logger.error('JSON parse error', e);
     }
     next();
   });
@@ -186,23 +203,36 @@ module.exports = (config, hooks, metaExport) => {
   /* Update by query */
   routerCreator('patch', '/', UPDATE, async (req, res, next) => {
     req.mjsHandled = true;
-    const filter = JSON.parse(req.get('filter') || '{}');
-    const options = JSON.parse(req.get('options') || '{}');
-    [res.mjsError, res.mjsResult] = await to(controller.editOne(filter, req.body, options));
-    if (res.mjsError) {
-      res.mjsResStatus = 304;
+    try {
+      const filter = JSON.parse(req.get('filter') || '{}');
+      const options = JSON.parse(req.get('options') || '{}');
+      [res.mjsError, res.mjsResult] = await to(controller.editOne(filter, req.body, options));
+      if (res.mjsError) {
+        res.mjsResStatus = 304;
+      }
+    } catch (e) {
+      res.mjsResStatus = 400;
+      res.mjsError = { message: 'JSON Parse Error ' + e };
+      logger.error('JSON parse error', e);
     }
+
     next();
   });
 
   /* Update by Id */
   routerCreator('patch', '/:id', UPDATE_BY_ID, async (req, res, next) => {
     req.mjsHandled = true;
-    const id = req.params.id || '';
-    const options = JSON.parse(req.get('options') || '{}');
-    [res.mjsError, res.mjsResult] = await to(controller.editById(id, req.body, options));
-    if (res.mjsError) {
-      res.mjsResStatus = 304;
+    try {
+      const id = req.params.id || '';
+      const options = JSON.parse(req.get('options') || '{}');
+      [res.mjsError, res.mjsResult] = await to(controller.editById(id, req.body, options));
+      if (res.mjsError) {
+        res.mjsResStatus = 304;
+      }
+    } catch (e) {
+      res.mjsResStatus = 400;
+      res.mjsError = { message: 'JSON Parse Error ' + e };
+      logger.error('JSON parse error', e);
     }
     next();
   });
@@ -210,10 +240,16 @@ module.exports = (config, hooks, metaExport) => {
   /* delete by query */
   routerCreator('delete', '/', DELETE, async (req, res, next) => {
     req.mjsHandled = true;
-    const filter = JSON.parse(req.get('filter') || '{}');
-    [res.mjsError, res.mjsResult] = await to(controller.removeOne(filter));
-    if (res.mjsError) {
-      res.mjsResStatus = 304;
+    try {
+      const filter = JSON.parse(req.get('filter') || '{}');
+      [res.mjsError, res.mjsResult] = await to(controller.removeOne(filter));
+      if (res.mjsError) {
+        res.mjsResStatus = 304;
+      }
+    } catch (e) {
+      res.mjsResStatus = 400;
+      res.mjsError = { message: 'JSON Parse Error ' + e };
+      logger.error('JSON parse error', e);
     }
     next();
   });
@@ -223,6 +259,7 @@ module.exports = (config, hooks, metaExport) => {
     req.mjsHandled = true;
     const id = req.params.id || '';
     const deleteUsages = req.get('delete-usages') || false;
+    logger.info('', {deleteUsages});
     let fullResults = {};
     if (config.checkUsageBeforeDelete) {
       for (let i = 0; i < config.checkUsageBeforeDelete.length; i++) {
@@ -233,12 +270,14 @@ module.exports = (config, hooks, metaExport) => {
       }
       if (fullResults && Object.keys(fullResults).length > 0 && !deleteUsages) {
         res.mjsError = { msg: 'Cannot delete, because there are some usages', example: fullResults, code: 'NO_DELETE_HAS_USAGES' };
+        logger.info('Found some usages');
         return next();
       }
     }
     if (deleteUsages && config.checkUsageBeforeDelete) {
       for (let i = 0; i < config.checkUsageBeforeDelete.length; i++) {
         const { model, key } = config.checkUsageBeforeDelete[i];
+        logger.info('Deleting item', {model, key});
         await to(metaExport[model].find({ [key]: id }).remove());
         // TODO error handle
       }
@@ -252,7 +291,10 @@ module.exports = (config, hooks, metaExport) => {
 
   // pre generic hook
   if (hooks && hooks.generic && hooks.generic.post) {
-    router.use(hooks.generic.post);
+    router.use((req, res, next) => {
+      logger.info('Executing model post hook');
+      hooks.generic.post(req, res, next);
+    });
   }
 
   return router;
