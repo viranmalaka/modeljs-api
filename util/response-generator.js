@@ -4,13 +4,13 @@ module.exports = {
   success: (req, res, next) => {
     if (!req.mjsHandled) return next();
     if (res.mjsResult) {
-      logger.info('ModelJS ')
+      logger.info('ModelJS ');
       res.status(res.mjsResStatus || 200).jsonp({
         success: true,
         result: res.mjsResult,
       });
     } else if (!res.mjsError) {
-      res.status(res.mjsResStatus).jsonp({ success: true });
+      res.status(res.mjsResStatus || 400).jsonp({ success: true });
     }
     next();
   },
