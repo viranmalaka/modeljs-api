@@ -59,7 +59,7 @@ class UserController {
           username: user._doc.username,
           userRole: user._doc.userRole,
         };
-        jwt.sign(encryptObject, SECRET, { expiresIn: '10h' }, (err3, token) => {
+        jwt.sign(encryptObject, SECRET, { expiresIn: this.config.tokenExpiresIn }, (err3, token) => {
           if (err3) reject(err3);
           delete user.password;
           resolve({

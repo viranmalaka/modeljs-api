@@ -8,6 +8,7 @@ module.exports = (config) => {
       adminKey: (config.auth && config.auth.adminKey) || null,
       enableAuth: (config.auth && config.auth.enable) || false,
       shape: (config.auth && config.auth.shape) || {},
+      tokenExpiresIn: (config.auth && config.auth.tokenExpiresIn) || '1d',
     },
     models: config.models.map((m) => {
       return {
@@ -30,13 +31,15 @@ module.exports = (config) => {
         privateActions: m.privateActions || [],
         allPrivate: m.allPrivate || false,
         createValidator: m.createValidator || false,
-        additionalRoutes: m.additionalRoutes && m.additionalRoutes.map(x => {
-          if(x.method && x.pathPattern && x.actionName && x.handler) {
-            return {...x};
-          } else {
-            throw "invalid additionalRoutes Object";
-          }
-        }),
+        additionalRoutes:
+          m.additionalRoutes &&
+          m.additionalRoutes.map((x) => {
+            if (x.method && x.pathPattern && x.actionName && x.handler) {
+              return { ...x };
+            } else {
+              throw 'invalid additionalRoutes Object';
+            }
+          }),
       };
     }),
   };

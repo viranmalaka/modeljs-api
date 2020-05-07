@@ -73,7 +73,7 @@ const authMiddleware = async (req, res, next) => {
     if (err) {
       req.isAuthenticated = false;
       req.user = null;
-      logger.info('Invalid Auth');
+      logger.error('Invalid Auth');
     } else {
       req.isAuthenticated = true;
       req.user = user;
