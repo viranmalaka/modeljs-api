@@ -17,7 +17,7 @@ module.exports.modelHook = (hook) => {
   const executeMiddleware = (a, b) => {
     if (hook && hook[a] && hook[a][b]) {
       return (req, res, next) => {
-        logger.error(`Executing [${a}] [${b}] hook`);
+        logger.log(`Executing [${a}] [${b}] hook`);
         hook && hook[a] && hook[a][b](req, res, next);
       }
     }
