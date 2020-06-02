@@ -12,6 +12,7 @@ const {
   GET_ONE,
   GET_BY_ID,
   UPDATE,
+  BULK_UPDATE,
   UPDATE_BY_ID,
   COUNT,
 } = require('../util/const').ACTIONS;
@@ -219,6 +220,35 @@ module.exports = (config, hooks, metaExport) => {
     next();
   });
 
+  /* bulk Update by query */
+  config.enableBulkUpdateEndpoint && routerCreator('patch', '/updates/bulk/', BULK_UPDATE, async (req, res, next) => {
+    req.mjsHandled = true;
+    try {
+      const filters = JSON.parse(req.get('filters') || '[]');
+      const updates = req.body.updates;
+
+      if (filters.length !== updates.length) {
+        res.mjsError = { message: 'filters and updates are not matched' };
+        res.mjsResStatus = 400;
+      } else {
+
+        const results = [], errors = [];
+
+        for (let i = 0; i < filters.length; i ++) {
+          const [err, res] = await to(controller.editOne((filters[i]), updates[i], {}));
+          results.push(res);
+          errors.push(err);
+        }
+        res.mjsResult = {results, errors};
+      }
+    } catch (e) {
+      res.mjsResStatus = 400;
+      res.mjsError = { message: 'JSON Parse Error ' + e };
+      logger.error('JSON parse error', e);
+    }
+    next();
+  });
+
   /* Update by Id */
   routerCreator('patch', '/:id', UPDATE_BY_ID, async (req, res, next) => {
     req.mjsHandled = true;
@@ -254,7 +284,7 @@ module.exports = (config, hooks, metaExport) => {
     next();
   });
 
-  /* Update by Id */
+  /* Delete by Id */
   routerCreator('delete', '/:id', DELETE_BY_ID, async (req, res, next) => {
     req.mjsHandled = true;
     const id = req.params.id || '';

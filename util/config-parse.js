@@ -40,6 +40,7 @@ module.exports = (config) => {
               throw 'invalid additionalRoutes Object';
             }
           }),
+        enableBulkUpdateEndpoint: m.enableBulkUpdateEndpoint,
       };
     }),
   };

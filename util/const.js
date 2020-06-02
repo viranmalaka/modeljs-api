@@ -8,6 +8,7 @@ module.exports = {
     GET_ONE: 'getOne',
     GET_BY_ID: 'getById',
     UPDATE: 'update',
+    BULK_UPDATE: 'bulkUpdate',
     UPDATE_BY_ID: 'updateById',
     DELETE: 'delete',
     DELETE_BY_ID: 'deleteById',
