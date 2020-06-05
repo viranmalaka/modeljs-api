@@ -128,15 +128,15 @@ module.exports = (config, hooks, metaExport) => {
       const complexPopulate = JSON.parse(req.get('complexPopulate') || 'null');
       const populate = req.get('populate') || '';
       const select = req.get('select') || '';
-      const sortBy = req.get('sortBy') || '';
+      const sortBy = JSON.parse(req.get('sortBy') || '{}');
       const paginate = JSON.parse(req.get('paginate') || null);
       logger.info('Searching with', {filter, complexPopulate, populate, select, sortBy, paginate});
       if (paginate) {
         [res.mjsError, res.mjsResult] = await to(
-          controller.paginate(filter, select, complexPopulate || populate, paginate),
+          controller.paginate(filter, select, complexPopulate || populate, paginate, sortBy),
         );
       } else {
-        [res.mjsError, res.mjsResult] = await to(controller.find(filter, select, complexPopulate || populate));
+        [res.mjsError, res.mjsResult] = await to(controller.find(filter, select, complexPopulate || populate, sortBy));
       }
     } catch (e) {
       res.mjsResStatus = 400;

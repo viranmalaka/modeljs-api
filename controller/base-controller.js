@@ -11,12 +11,12 @@ class BaseController {
     return new this.Model(body).save();
   }
 
-  find(filter, select, populate) {
-    return this.Model.find(filter, select, {populate: populate});
+  find(filter, select, populate, sort) {
+    return this.Model.find(filter, select, {populate, sort});
   }
 
-  paginate(filter, select, populate, paginateInfo) {
-    return this.Model.paginate(filter, {select, populate: populate, ...paginateInfo});
+  paginate(filter, select, populate, paginateInfo, sort) {
+    return this.Model.paginate(filter, {select, populate, sort, ...paginateInfo});
   }
 
   count(filter) {
