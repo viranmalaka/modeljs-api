@@ -9,6 +9,7 @@ module.exports = (config) => {
       enableAuth: (config.auth && config.auth.enable) || false,
       shape: (config.auth && config.auth.shape) || {},
       tokenExpiresIn: (config.auth && config.auth.tokenExpiresIn) || '1d',
+      isAuthenticatedMiddleware: config.auth && config.auth.isAuthenticatedMiddleware,
     },
     models: config.models.map((m) => {
       return {

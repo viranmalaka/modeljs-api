@@ -46,6 +46,14 @@ const init = (app, config, hooks) => {
   if (config.auth.enableAuth) {
     app.use(pathStart, authRoute.authMiddleware);
     app.use(`${pathStart}/user`, authRoute.authRouter(config.auth, hooks && hooks.signUp, metaExport));
+  } else if(config.auth.isAuthenticatedMiddleware) {
+    app.use(pathStart, config.auth.isAuthenticatedMiddleware);
+    app.get(`${pathStart}/user/who`, (req, res, next) => {
+      req.mjsHandled = true;
+      res.mjsResult = req.isAuthenticated ? req.user : null;
+      res.mjsResStatus = req.isAuthenticated ? 200 : 401;
+      next();
+    });
   }
 
   // model vise routes
