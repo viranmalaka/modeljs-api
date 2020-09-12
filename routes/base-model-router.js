@@ -146,31 +146,9 @@ module.exports = (config, hooks, metaExport) => {
     next();
   });
 
-  /* Find By Id */
-  routerCreator('get', '/:id', GET_BY_ID, async (req, res, next) => {
-    req.mjsHandled = true;
-    try {
-      const id = req.params.id || '';
-      const complexPopulate = JSON.parse(req.get('complexPopulate') || 'null');
-      const populate = req.get('populate') || '';
-      const select = req.get('select') || '';
-      if (/^[a-f\d]{24}$/i.test(id)) {
-        [res.mjsError, res.mjsResult] = await to(controller.findById(id, select, complexPopulate || populate));
-        logger.info('get object by _id with ', {complexPopulate, populate, select});
-      } else {
-        [res.mjsError, res.mjsResult] = await to(controller.findOne({ id }, select, complexPopulate || populate));
-        logger.info('get object by id with ', {complexPopulate, populate, select});
-      }
-    } catch (e) {
-      res.mjsResStatus = 400;
-      res.mjsError = { message: 'JSON Parse Error ' + e };
-      logger.error('JSON parse error', e);
-    }
-    next();
-  });
 
   /* Get one Objects by filter */
-  routerCreator('get', '/one', GET_ONE, async (req, res, next) => {
+  routerCreator('get', '/get/one', GET_ONE, async (req, res, next) => {
     req.mjsHandled = true;
     try {
       const filter = JSON.parse(req.get('filter') || '{}');
@@ -188,11 +166,37 @@ module.exports = (config, hooks, metaExport) => {
   });
 
   /* Get count of the objects*/
-  routerCreator('get', '/count', COUNT, async (req, res, next) => {
+  routerCreator('get', '/get/count', COUNT, async (req, res, next) => {
     req.mjsHandled = true;
     try {
       const filter = JSON.parse(req.get('filter') || '{}');
-      [res.mjsError, res.mjsResult] = await to(controller.count(filter));
+      const [err, count] = await to(controller.count(filter));
+      res.mjsError = err;
+      res.mjsResult = {count};
+      logger.info('get count with ', { filter });
+    } catch (e) {
+      res.mjsResStatus = 400;
+      res.mjsError = { message: 'JSON Parse Error ' + e };
+      logger.error('JSON parse error', e);
+    }
+    next();
+  });
+
+  /* Find By Id */
+  routerCreator('get', '/:id', GET_BY_ID, async (req, res, next) => {
+    req.mjsHandled = true;
+    try {
+      const id = req.params.id || '';
+      const complexPopulate = JSON.parse(req.get('complexPopulate') || 'null');
+      const populate = req.get('populate') || '';
+      const select = req.get('select') || '';
+      if (/^[a-f\d]{24}$/i.test(id)) {
+        [res.mjsError, res.mjsResult] = await to(controller.findById(id, select, complexPopulate || populate));
+        logger.info('get object by _id with ', {complexPopulate, populate, select});
+      } else {
+        [res.mjsError, res.mjsResult] = await to(controller.findOne({ id }, select, complexPopulate || populate));
+        logger.info('get object by id with ', {complexPopulate, populate, select, id});
+      }
     } catch (e) {
       res.mjsResStatus = 400;
       res.mjsError = { message: 'JSON Parse Error ' + e };
